@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">MyWeather</string>
+
+    <string name="txt_weather_icon_url">https://openweathermap.org/img/wn/%1$s@4x.png</string>
+    <string name="txt_weather_description">%1$s (%2$s)</string>
+    <string name="txt_temperature">%1$.1f\u00B0C</string>
+    <string name="txt_temperature_feels_like">Feels like %.1f\u00B0C</string>
+    <string name="txt_temperature_min_max">%1$.1f/%2$.1f\u00B0C</string>
+    <string name="txt_humidity">%1$d%%</string>
+    <string name="txt_clouds">%1$d%%</string>
+    <string name="txt_wind">%1$.1f km/h</string>
+    <string name="txt_pressure">%1$d hPa</string>
+    <string name="txt_visibility">%1$d km</string>
+    <string name="txt_weather_icon">Weather Icon</string>
+    <string name="txt_min_max">Min/max</string>
+    <string name="txt_label_humidity">Humidity</string>
+    <string name="txt_label_clouds">Clouds</string>
+    <string name="txt_label_wind">Wind</string>
+    <string name="txt_label_pressure">Pressure</string>
+    <string name="txt_label_visibility">Visibility</string>
+
+    <string name="txt_error_no_internet">No Internet Connection</string>
+    <string name="txt_click_to_refresh">Click to Refresh</string>
 </resources>
