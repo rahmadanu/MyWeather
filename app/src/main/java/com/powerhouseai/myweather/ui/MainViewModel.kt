@@ -23,9 +23,9 @@ class MainViewModel @Inject constructor(
     private val _cityWeather = MutableLiveData<Resource<WeatherResponse>>()
     val cityWeather: LiveData<Resource<WeatherResponse>> get() = _cityWeather
 
-    fun getCurrentLocationWeather(lat: Double, lon: Double) {
+    fun getCurrentLocationWeather(latitude: Double, longitude: Double) {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = repository.getCurrentLocationWeather(lat, lon)
+            val response = repository.getCurrentLocationWeather(latitude, longitude)
 
             viewModelScope.launch(Dispatchers.Main) {
                 _currentLocationWeather.postValue(response)
