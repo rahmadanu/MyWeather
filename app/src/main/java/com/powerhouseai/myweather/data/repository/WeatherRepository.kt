@@ -50,6 +50,7 @@ class WeatherRepositoryImpl @Inject constructor(
 
     private fun mapWeatherResponseToUiModel(response: WeatherResponse): WeatherUiModel =
         WeatherUiModel(
+            id = response.id,
             currentCity = response.name,
             weatherIcon = Strings.get(R.string.txt_weather_icon_url, response.weather?.get(0)?.icon.toString()),
             weatherDescription = Strings.get(R.string.txt_weather_description, response.weather?.get(0)?.main.toString(), response.weather?.get(0)?.description.toString()),

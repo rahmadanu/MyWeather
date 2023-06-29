@@ -1,6 +1,12 @@
 package com.powerhouseai.myweather.data.model.ui
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "weather")
 data class WeatherUiModel(
+    @PrimaryKey(autoGenerate = false)
+    val id: Int? = null,
     val currentCity: String? = "",
     val weatherIcon: String? = "",
     val weatherDescription: String? = "",

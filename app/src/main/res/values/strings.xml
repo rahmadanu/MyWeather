@@ -21,4 +21,6 @@
 
     <string name="txt_error_no_internet">No Internet Connection</string>
     <string name="txt_click_to_refresh">Click to Refresh</string>
+    <string name="txt_need_permission_description">App needs location permission to work properly</string>
+    <string name="txt_go_to_settings">Go to Settings</string>
 </resources>

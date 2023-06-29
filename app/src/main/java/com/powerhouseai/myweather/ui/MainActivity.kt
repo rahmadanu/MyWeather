@@ -14,12 +14,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.powerhouseai.myweather.R
 import com.powerhouseai.myweather.data.model.ui.WeatherUiModel
 import com.powerhouseai.myweather.databinding.ActivityMainBinding
 import com.powerhouseai.myweather.util.wrapper.Resource
@@ -41,14 +40,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupCurrentLocation()
-        actionClick()
+        setupOnClick()
         observeWeather()
     }
 
-    private fun actionClick() {
-        binding.btnRefresh.setOnClickListener {
-            getCurrentLocation()
-        }
+    private fun setupCurrentLocation() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        getWeatherByCurrentLocation()
     }
 
     private val locationPermissionRequest = registerForActivityResult(
@@ -57,34 +56,19 @@ class MainActivity : AppCompatActivity() {
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
                 // Precise location access granted.
-                getCurrentLocation()
+                getWeatherByCurrentLocation()
             }
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
                 // Only approximate location access granted.
-                getCurrentLocation()
+                getWeatherByCurrentLocation()
             } else -> {
                 // No location access granted.
-                AlertDialog.Builder(this)
-                    .setMessage("App needs location permission to work properly")
-                    .setCancelable(false)
-                    .setPositiveButton("Go to Settings") { dialog, _ ->
-                        val intent = Intent()
-                        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                        val uri = Uri.fromParts("package", this.packageName, null)
-                        intent.data = uri
-                        startActivity(intent)
-                    }
-                    .show()
+                showGoToSettingsDialog()
             }
         }
     }
-    private fun setupCurrentLocation() {
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        getCurrentLocation()
-    }
-
-    private fun getCurrentLocation() {
+    private fun getWeatherByCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -113,6 +97,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadData(lat: Double, lon: Double) {
         viewModel.getCurrentLocationWeather(lat, lon)
+    }
+
+    private fun showGoToSettingsDialog() {
+        AlertDialog.Builder(this)
+            .setMessage(getString(R.string.txt_need_permission_description))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.txt_go_to_settings)) { dialog, _ ->
+                val intent = Intent()
+                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                val uri = Uri.fromParts("package", this.packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+            .show()
+    }
+
+    private fun setupOnClick() {
+        binding.btnRefresh.setOnClickListener {
+            getWeatherByCurrentLocation()
+        }
     }
 
     private fun observeWeather() {

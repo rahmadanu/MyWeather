@@ -68,6 +68,19 @@ dependencies {
     // Google play services
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
+    // Room and Lifecycle dependencies
+    implementation "androidx.room:room-runtime:2.5.2"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    kapt "androidx.room:room-compiler:2.5.2"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+
+    // Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:2.5.2"
+
+    // Database encryption
+    implementation "net.zetetic:android-database-sqlcipher:4.4.0"
+    implementation "androidx.sqlite:sqlite-ktx:2.3.1"
+
     implementation("androidx.activity:activity-ktx:1.7.2")
 
     implementation 'androidx.core:core-ktx:1.8.0'
