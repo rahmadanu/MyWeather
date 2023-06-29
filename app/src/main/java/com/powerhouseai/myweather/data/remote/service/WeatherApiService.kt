@@ -1,18 +1,21 @@
 package com.powerhouseai.myweather.data.remote.service
 
+import com.powerhouseai.myweather.data.model.request.WeatherCityNameRequest
+import com.powerhouseai.myweather.data.model.request.WeatherLatLonRequest
+import com.powerhouseai.myweather.data.model.response.WeatherResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface WeatherApiService {
 
     @GET("weather")
-    fun getWeatherByLatLong(
-        @Query("lat") latitude: Double,
-        @Query("lon") longitude: Double,
-    )
+    suspend fun getWeatherByLatLon(
+        @Body latLonRequest: WeatherLatLonRequest
+    ): WeatherResponse
 
     @GET("weather")
-    fun getWeatherByCityName(
-        @Query("q") city: String,
-    )
+    suspend fun getWeatherByCityName(
+        @Body cityNameRequest: WeatherCityNameRequest
+    ): WeatherResponse
 }
