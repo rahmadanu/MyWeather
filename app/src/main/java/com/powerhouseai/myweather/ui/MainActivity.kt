@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -23,6 +24,7 @@ import com.google.android.gms.location.Priority
 import com.powerhouseai.myweather.R
 import com.powerhouseai.myweather.data.model.ui.WeatherUiModel
 import com.powerhouseai.myweather.databinding.ActivityMainBinding
+import com.powerhouseai.myweather.ui.adapter.WeatherAdapter
 import com.powerhouseai.myweather.util.work.SyncInitializer
 import com.powerhouseai.myweather.util.wrapper.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,18 +41,27 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private val adapter: WeatherAdapter by lazy {
+        WeatherAdapter {}
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupUi()
+        setupView()
         setupCurrentLocation()
         setupOnClick()
         observeWeather()
     }
 
-    private fun setupUi() {
+    private fun setupView() {
+        binding.rvCitiesWeather.apply {
+            layoutManager = GridLayoutManager(this@MainActivity, 2)
+            adapter = this@MainActivity.adapter
+        }
+
         SyncInitializer.isWorkRunning(this@MainActivity).observe(this) {
             if (it) {
                 binding.pbLoading.visibility = View.VISIBLE
@@ -113,6 +124,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadData(latitude: Double, longitude: Double) {
         viewModel.getCurrentLocationWeather(latitude, longitude)
+        viewModel.getCities()
     }
 
     private fun showTurnOnGpsDialog() {
@@ -171,14 +183,44 @@ class MainActivity : AppCompatActivity() {
                     if (it.message != null) {
                         Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
                     }
-                    bindWeatherToUi(it.data)
+                    bindCurrentLocationWeatherToView(it.data)
+                }
+                else -> {}
+            }
+        }
+
+        viewModel.citiesWeather.observe(this) {
+            binding.pbLoading.visibility = View.GONE
+
+            when (it) {
+                is Resource.Loading -> {
+                    Log.d("weather", "is loading")
+                }
+                is Resource.Error -> {
+                    Log.d("weather", "is error ${it.message}")
+                    Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Empty -> {
+                    Log.d("weather", "is empty ${it.message}")
+                    Toast.makeText(this, "Empty", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Success -> {
+                    Log.d("weather", "is success ${it.data}")
+                    if (it.message != null) {
+                        Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                    bindCitiesWeatherToView(it.data)
                 }
                 else -> {}
             }
         }
     }
 
-    private fun bindWeatherToUi(data: WeatherUiModel?) {
+    private fun bindCitiesWeatherToView(data: List<WeatherUiModel>?) {
+        adapter.submitList(data)
+    }
+
+    private fun bindCurrentLocationWeatherToView(data: WeatherUiModel?) {
         data?.let {
             with(binding) {
                 Glide.with(this@MainActivity)

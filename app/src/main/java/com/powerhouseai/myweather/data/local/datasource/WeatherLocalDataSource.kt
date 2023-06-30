@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface WeatherLocalDataSource {
+    fun getWeatherQueryList(): List<String>
     suspend fun insertWeather(weather: WeatherUiModel)
     suspend fun deleteWeather(ids: List<Int?>)
     fun getWeather(): List<WeatherUiModel>
@@ -19,6 +20,10 @@ class WeatherLocalDataSourceImpl @Inject constructor(
     private val dao: WeatherDao,
     private val dataStore: WeatherDataStoreManager
 ): WeatherLocalDataSource {
+    override fun getWeatherQueryList(): List<String> {
+        return listOf("New York", "Singapore", "Mumbai", "Delhi", "Sydney", "Melbourne")
+    }
+
     override suspend fun insertWeather(weather: WeatherUiModel) {
         dao.insertWeather(weather)
     }

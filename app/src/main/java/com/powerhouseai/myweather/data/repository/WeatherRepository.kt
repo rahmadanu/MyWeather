@@ -15,17 +15,13 @@ import com.powerhouseai.myweather.util.work.Syncable
 import com.powerhouseai.myweather.util.work.Synchronizer
 import com.powerhouseai.myweather.util.work.syncWeather
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
 
 interface WeatherRepository : Syncable {
     suspend fun setCurrentLocation(latitude: Double, longitude: Double)
     suspend fun getCurrentLocationWeather(latitude: Double, longitude: Double): Resource<WeatherUiModel>
-    suspend fun getWeatherByCityName(city: String): Resource<WeatherResponse>
+    suspend fun getCitiesWeather(): Resource<List<WeatherUiModel>>
 }
 
 class WeatherRepositoryImpl @Inject constructor(
@@ -49,22 +45,38 @@ class WeatherRepositoryImpl @Inject constructor(
                     units = "metric",
                     language = ""
                 )
-                localDataSource.insertWeather(mapWeatherResponseToUiModel(weatherRemote))
+                localDataSource.insertWeather(mapWeatherResponseToUiModel(weatherRemote, weatherRemote.id))
+
                 mapWeatherResponseToUiModel(weatherRemote)
             } else {
-                weatherLocal[0]
+                weatherLocal.first { it.currentLocationId != null }
             }
         }
     }
 
-    override suspend fun getWeatherByCityName(city: String): Resource<WeatherResponse> {
+    override suspend fun getCitiesWeather(): Resource<List<WeatherUiModel>> {
         return proceedResource(context) {
-            remoteDataSource.getWeatherByCityName(
-                city = city,
-                mode = "",
-                units = "metric",
-                language = ""
-            )
+            val weatherLocal = localDataSource.getWeather()
+            val cities = localDataSource.getWeatherQueryList()
+
+            if (weatherLocal.size < 2) {
+                val result = mutableListOf<WeatherUiModel>()
+
+                cities.forEach {
+                    val citiesWeather = remoteDataSource.getWeatherByCityName(
+                        city = it,
+                        mode = "",
+                        units = "metric",
+                        language = ""
+                    )
+                    localDataSource.insertWeather(mapWeatherResponseToUiModel(citiesWeather))
+                    result.add(mapWeatherResponseToUiModel(citiesWeather))
+                }
+
+                result
+            } else {
+                weatherLocal.filter { it.currentLocationId == null }
+            }
         }
     }
 
@@ -77,22 +89,33 @@ class WeatherRepositoryImpl @Inject constructor(
             },
             modelUpdater = {
                 val latLon = localDataSource.getCurrentLocation().last()
+                val cities = localDataSource.getWeatherQueryList()
 
-                val weatherRemote = remoteDataSource.getWeatherByLatLon(
+                val currentLocationWeather = remoteDataSource.getWeatherByLatLon(
                     latLon.first().toDouble(),
                     latLon.last().toDouble(),
                     mode = "",
                     units = "metric",
                     language = ""
                 )
+                localDataSource.insertWeather(mapWeatherResponseToUiModel(currentLocationWeather, currentLocationWeather.id))
 
-                localDataSource.insertWeather(mapWeatherResponseToUiModel(weatherRemote))
+                cities.forEach {
+                    val citiesWeather = remoteDataSource.getWeatherByCityName(
+                        city = it,
+                        mode = "",
+                        units = "metric",
+                        language = ""
+                    )
+                    localDataSource.insertWeather(mapWeatherResponseToUiModel(citiesWeather))
+                }
             }
         )
 
-    private fun mapWeatherResponseToUiModel(response: WeatherResponse): WeatherUiModel =
+    private fun mapWeatherResponseToUiModel(response: WeatherResponse, currentLocationId: Int? = null): WeatherUiModel =
         WeatherUiModel(
             id = response.id,
+            currentLocationId = currentLocationId,
             currentCity = response.name,
             weatherIcon = Strings.get(R.string.txt_weather_icon_url, response.weather?.get(0)?.icon.toString()),
             weatherDescription = Strings.get(R.string.txt_weather_description, response.weather?.get(0)?.main.toString(), response.weather?.get(0)?.description.toString()),
@@ -105,6 +128,7 @@ class WeatherRepositoryImpl @Inject constructor(
             wind = Strings.get(R.string.txt_wind, response.wind?.speed ?: 0),
             pressure = Strings.get(R.string.txt_pressure, response.main?.pressure ?: 0),
             visibility = Strings.get(R.string.txt_visibility, response.visibility?.div(1000) ?: 0),
+            countryCode = response.sys?.country,
             lastUpdatedOn = Strings.get(R.string.txt_last_updated_on, DateUtil.getLastUpdatedDate(response.dt))
         )
 }

@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class WeatherUiModel(
     @PrimaryKey(autoGenerate = false)
     val id: Int? = null,
+    val currentLocationId: Int? = null,
     val currentCity: String? = "",
     val weatherIcon: String? = "",
     val weatherDescription: String? = "",
@@ -19,5 +20,6 @@ data class WeatherUiModel(
     val wind: String? = "",
     val pressure: String? = "",
     val visibility: String? = "",
+    val countryCode: String? = "",
     val lastUpdatedOn: String? = ""
 )

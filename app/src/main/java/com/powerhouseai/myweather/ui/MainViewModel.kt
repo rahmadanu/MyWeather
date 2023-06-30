@@ -1,6 +1,5 @@
 package com.powerhouseai.myweather.ui
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,11 +21,8 @@ class MainViewModel @Inject constructor(
     private val _currentLocationWeather = MutableLiveData<Resource<WeatherUiModel>>()
     val currentLocationWeather: LiveData<Resource<WeatherUiModel>> get() = _currentLocationWeather
 
-    private val _currentLocationWeatherLocal = mutableListOf<WeatherUiModel>()
-    val currentLocationWeatherLocal: List<WeatherUiModel> get() = _currentLocationWeatherLocal
-
-    private val _cityWeather = MutableLiveData<Resource<WeatherResponse>>()
-    val cityWeather: LiveData<Resource<WeatherResponse>> get() = _cityWeather
+    private val _citiesWeather = MutableLiveData<Resource<List<WeatherUiModel>>>()
+    val citiesWeather: LiveData<Resource<List<WeatherUiModel>>> get() = _citiesWeather
 
     fun getCurrentLocationWeather(latitude: Double, longitude: Double) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -34,22 +30,20 @@ class MainViewModel @Inject constructor(
 
             repository.setCurrentLocation(latitude, longitude)
 
-            val weather = repository.getCurrentLocationWeather(latitude, longitude)
+            val currentLocationWeather = repository.getCurrentLocationWeather(latitude, longitude)
 
             viewModelScope.launch(Dispatchers.Main) {
-                _currentLocationWeather.postValue(weather)
+                _currentLocationWeather.postValue(currentLocationWeather)
             }
         }
     }
 
-    fun getWeatherByCityName(city: String) {
+    fun getCities() {
         viewModelScope.launch(Dispatchers.IO) {
-            _cityWeather.postValue(Resource.Loading())
-
-            val weather = repository.getWeatherByCityName(city)
+            val citiesWeather = repository.getCitiesWeather()
 
             viewModelScope.launch(Dispatchers.Main) {
-                _cityWeather.postValue(weather)
+                _citiesWeather.postValue(citiesWeather)
             }
         }
     }
