@@ -1,5 +1,6 @@
 package com.powerhouseai.myweather.ui
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,12 +22,17 @@ class MainViewModel @Inject constructor(
     private val _currentLocationWeather = MutableLiveData<Resource<WeatherUiModel>>()
     val currentLocationWeather: LiveData<Resource<WeatherUiModel>> get() = _currentLocationWeather
 
+    private val _currentLocationWeatherLocal = mutableListOf<WeatherUiModel>()
+    val currentLocationWeatherLocal: List<WeatherUiModel> get() = _currentLocationWeatherLocal
+
     private val _cityWeather = MutableLiveData<Resource<WeatherResponse>>()
     val cityWeather: LiveData<Resource<WeatherResponse>> get() = _cityWeather
 
     fun getCurrentLocationWeather(latitude: Double, longitude: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             _currentLocationWeather.postValue(Resource.Loading())
+
+            repository.setCurrentLocation(latitude, longitude)
 
             val weather = repository.getCurrentLocationWeather(latitude, longitude)
 
@@ -38,7 +44,7 @@ class MainViewModel @Inject constructor(
 
     fun getWeatherByCityName(city: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _currentLocationWeather.postValue(Resource.Loading())
+            _cityWeather.postValue(Resource.Loading())
 
             val weather = repository.getWeatherByCityName(city)
 

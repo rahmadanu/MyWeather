@@ -10,7 +10,7 @@ import retrofit2.HttpException
 
 object StateHelper {
 
-    suspend fun <T> proceed(context: Context, coroutines: suspend () -> T): Resource<T> {
+    suspend fun <T> proceedResource(context: Context, coroutines: suspend () -> T): Resource<T> {
         return if (AppStatus.checkConnectivity(context) != AppStatus.NONE) {
             try {
                 Resource.Success(coroutines.invoke())
@@ -28,7 +28,15 @@ object StateHelper {
                 }
             }
         } else {
-            Resource.Error(Exception(), context.getString(R.string.txt_error_no_internet))
+            try {
+                if (coroutines.invoke() != null) {
+                    Resource.Success(coroutines.invoke(), context.getString(R.string.txt_error_no_internet))
+                } else {
+                    Resource.Error(Exception(), context.getString(R.string.txt_error_no_internet))
+                }
+            } catch (e: Exception) {
+                Resource.Error(Exception(), context.getString(R.string.txt_error_no_internet))
+            }
         }
     }
 }

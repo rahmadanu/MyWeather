@@ -19,4 +19,5 @@ data class WeatherUiModel(
     val wind: String? = "",
     val pressure: String? = "",
     val visibility: String? = "",
+    val lastUpdatedOn: String? = ""
 )

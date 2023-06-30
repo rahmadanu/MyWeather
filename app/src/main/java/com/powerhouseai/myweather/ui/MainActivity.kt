@@ -8,12 +8,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -21,8 +23,11 @@ import com.google.android.gms.location.Priority
 import com.powerhouseai.myweather.R
 import com.powerhouseai.myweather.data.model.ui.WeatherUiModel
 import com.powerhouseai.myweather.databinding.ActivityMainBinding
+import com.powerhouseai.myweather.util.work.SyncInitializer
 import com.powerhouseai.myweather.util.wrapper.Resource
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -39,9 +44,20 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupUi()
         setupCurrentLocation()
         setupOnClick()
         observeWeather()
+    }
+
+    private fun setupUi() {
+        SyncInitializer.isWorkRunning(this@MainActivity).observe(this) {
+            if (it) {
+                binding.pbLoading.visibility = View.VISIBLE
+            } else {
+                binding.pbLoading.visibility = View.GONE
+            }
+        }
     }
 
     private fun setupCurrentLocation() {
@@ -79,10 +95,10 @@ class MainActivity : AppCompatActivity() {
         ) {
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener { location: Location? ->
-                    if (location != null) {
-                        loadData(lat = location.latitude, lon = location.longitude)
-                    } else {
-                        Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show()
+                    loadData(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+
+                    if (location == null) {
+                        showTurnOnGpsDialog()
                     }
                 }
         } else {
@@ -95,8 +111,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadData(lat: Double, lon: Double) {
-        viewModel.getCurrentLocationWeather(lat, lon)
+    private fun loadData(latitude: Double, longitude: Double) {
+        viewModel.getCurrentLocationWeather(latitude, longitude)
+    }
+
+    private fun showTurnOnGpsDialog() {
+        AlertDialog.Builder(this)
+            .setMessage(getString(R.string.txt_turn_on_gps))
+            .setCancelable(false)
+            .setPositiveButton("Ok") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun showGoToSettingsDialog() {
@@ -115,23 +141,36 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupOnClick() {
         binding.btnRefresh.setOnClickListener {
-            getWeatherByCurrentLocation()
+            SyncInitializer.enqueueWork(this)
+
+            lifecycleScope.launch {
+                delay(5000)
+                getWeatherByCurrentLocation()
+            }
         }
     }
 
     private fun observeWeather() {
         viewModel.currentLocationWeather.observe(this) {
+            binding.pbLoading.visibility = View.GONE
+
             when (it) {
                 is Resource.Loading -> {
                     Log.d("weather", "is loading")
-                    Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Error -> {
                     Log.d("weather", "is error ${it.message}")
                     Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
                 }
+                is Resource.Empty -> {
+                    Log.d("weather", "is empty ${it.message}")
+                    Toast.makeText(this, "Empty", Toast.LENGTH_SHORT).show()
+                }
                 is Resource.Success -> {
                     Log.d("weather", "is success ${it.data}")
+                    if (it.message != null) {
+                        Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                    }
                     bindWeatherToUi(it.data)
                 }
                 else -> {}
@@ -148,6 +187,7 @@ class MainActivity : AppCompatActivity() {
                     .into(ivWeather)
                 ivWeather.contentDescription = it.weatherDescription
 
+                tvLastUpdated.text = it.lastUpdatedOn
                 tvCurrentLocation.text = it.currentCity
                 tvWeatherDescription.text = it.weatherDescription
                 tvTodayDate.text = it.todayDate

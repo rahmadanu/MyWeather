@@ -5,7 +5,6 @@ import com.powerhouseai.myweather.data.remote.service.WeatherApiService
 import javax.inject.Inject
 
 interface WeatherRemoteDataSource {
-
     suspend fun getWeatherByLatLon(
         latitude: Double,
         longitude: Double,
@@ -13,7 +12,6 @@ interface WeatherRemoteDataSource {
         units: String,
         language: String,
     ): WeatherResponse
-
     suspend fun getWeatherByCityName(
         city: String,
         mode: String,

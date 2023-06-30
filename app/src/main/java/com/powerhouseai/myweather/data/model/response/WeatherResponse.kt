@@ -1,9 +1,13 @@
 package com.powerhouseai.myweather.data.model.response
 
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class WeatherResponse(
+    @SerializedName("id")
+    var id: Int? = null,
     @SerializedName("base")
     var base: String? = null,
     @SerializedName("clouds")
@@ -14,8 +18,6 @@ data class WeatherResponse(
     var coord: Coord? = null,
     @SerializedName("dt")
     var dt: Int? = null,
-    @SerializedName("id")
-    var id: Int? = null,
     @SerializedName("main")
     var main: Main? = null,
     @SerializedName("name")
