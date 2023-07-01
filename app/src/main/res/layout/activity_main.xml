@@ -161,12 +161,13 @@
                     android:id="@+id/tvTemperatureMinMax"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="bottom"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvTemperatureMinMaxLabel"
                     app:drawableStartCompat="@drawable/ic_temperature"
+
                     tools:text="35/20" />
 
                 <TextView
@@ -185,12 +186,13 @@
                     android:id="@+id/tvHumidity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="bottom"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:drawableStartCompat="@drawable/ic_temperature"
+                    app:drawableStartCompat="@drawable/ic_humidity"
+                    android:drawablePadding="4dp"
                     tools:text="40%" />
 
                 <TextView
@@ -209,12 +211,13 @@
                     android:id="@+id/tvClouds"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="bottom"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="@id/tvWind"
                     app:layout_constraintTop_toBottomOf="@id/tvCloudsLabel"
-                    app:drawableStartCompat="@drawable/ic_temperature"
+                    app:drawableStartCompat="@drawable/ic_cloud"
+                    android:drawablePadding="4dp"
                     tools:text="35%" />
 
                 <TextView
@@ -234,13 +237,14 @@
                     android:id="@+id/tvWind"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="bottom"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="@id/tvWindLabel"
                     app:layout_constraintEnd_toEndOf="@id/tvWindLabel"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:drawableStartCompat="@drawable/ic_temperature"
+                    app:drawableStartCompat="@drawable/ic_wind"
+                    android:drawablePadding="4dp"
                     tools:text="10km/h" />
 
                 <TextView
@@ -258,12 +262,13 @@
                     android:id="@+id/tvPressure"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="bottom"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     app:layout_constraintTop_toBottomOf="@id/tvPressureLabel"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:drawableStartCompat="@drawable/ic_temperature"
+                    app:drawableStartCompat="@drawable/ic_pressure"
+                    android:drawablePadding="4dp"
                     tools:text="1000" />
 
                 <TextView
@@ -281,12 +286,13 @@
                     android:id="@+id/tvVisibility"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="bottom"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="@id/tvPressure"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:drawableStartCompat="@drawable/ic_temperature"
+                    app:drawableStartCompat="@drawable/ic_visibility"
+                    android:drawablePadding="4dp"
                     tools:text="1000 m" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -131,7 +131,12 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setMessage(getString(R.string.txt_turn_on_gps))
             .setCancelable(false)
-            .setPositiveButton("Ok") { dialog, _ ->
+            .setPositiveButton(getString(R.string.txt_ok)) { dialog, _ ->
+                val intent = Intent()
+                intent.action = Settings.ACTION_LOCATION_SOURCE_SETTINGS
+                startActivity(intent)
+            }
+            .setNegativeButton(getString(R.string.txt_later)) { dialog, _ ->
                 dialog.dismiss()
             }
             .show()

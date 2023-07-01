@@ -52,8 +52,9 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:drawableStartCompat="@drawable/ic_temperature"
-            tools:text="40%"/>
+            android:drawablePadding="4dp"
+            tools:text="40%"
+            app:drawableTopCompat="@drawable/ic_humidity" />
 
         <TextView
             android:id="@+id/tvWind"
@@ -64,8 +65,9 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:drawableStartCompat="@drawable/ic_temperature"
-            tools:text="10 km/h"/>
+            app:drawableTopCompat="@drawable/ic_wind"
+            android:drawablePadding="4dp"
+            tools:text="10 km/h" />
 
         <ImageView
             android:id="@+id/ivWeather"
