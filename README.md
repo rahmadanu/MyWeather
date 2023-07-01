@@ -20,7 +20,7 @@ Weather information is retrieved by sending latitude and longtitude from user's 
 <br></br>
 - Support offline-first functionality
 <br></br>
-Offline-first is needed to provide some weather information while user is offline. This is done by inserting weather response from api to local database in the app and the weather information retrieved to the UI is only from local database in order to follow best practice Single Source of Truth, unless it is the user first time of making a network call
+Offline-first is needed to provide some weather information while user is offline. This is done by inserting weather response from api to local database in the app and the weather information retrieved to the UI is only from local database in order to follow best practice Single Source of Truth.
 <br></br>
 - Sync network call in background task
 <br></br>
